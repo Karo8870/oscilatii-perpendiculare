@@ -1,3 +1,3 @@
 ```sh
-manim -pql simple_oscillation_scene.py
+manim -pql base_oscillation_scene.py
 ```

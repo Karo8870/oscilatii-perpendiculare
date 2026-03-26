@@ -4,15 +4,16 @@ from objects.angle_circle import AngleCircle
 from objects.moving_dot import MovingDot
 
 
-class SimpleOscillation(Scene):
-    def construct(self):
-        x_phi_0 = PI / 4 + PI / 2
-        x_radius = 2
-        x_w = 1
+class BaseOscillation(Scene):
+    x_phi_0 = PI / 4
+    x_radius = 2
+    x_w = 5
 
-        y_phi_0 = PI / 4
-        y_radius = 2
-        y_w = 2
+    y_phi_0 = PI / 4
+    y_radius = 2
+    y_w = 3
+
+    def construct(self):
 
         # First oscillator
         y_formula = MathTex(r"y(t)=A_y\sin(\omega_y t+\phi_y)")
@@ -20,7 +21,7 @@ class SimpleOscillation(Scene):
         self.play(Write(y_formula))
 
         y_angle_circle = AngleCircle(
-            radius=y_radius, phi_0=y_phi_0, arc_offset=0, label=r"\phi_y"
+            radius=self.y_radius, phi_0=self.y_phi_0, arc_offset=0, label=r"\phi_y"
         )
 
         self.play(
@@ -29,14 +30,16 @@ class SimpleOscillation(Scene):
         )
 
         self.play(
-            y_angle_circle.angle_tracker.animate.set_value(TAU * 2 * y_w + y_phi_0),
+            y_angle_circle.angle_tracker.animate.set_value(
+                TAU * 2 * self.y_w + self.y_phi_0
+            ),
             run_time=8,
         )
-        y_angle_circle.angle_tracker.set_value(y_phi_0)
+        y_angle_circle.angle_tracker.set_value(self.y_phi_0)
 
         y_moving_dot = MovingDot(
             rotation=PI / 2,
-            length=y_radius * 2,
+            length=self.y_radius * 2,
             dot_y=lambda: y_angle_circle.arrow.get_end()[1],
         )
 
@@ -45,10 +48,12 @@ class SimpleOscillation(Scene):
         self.play(Create(y_moving_dot))
 
         self.play(
-            y_angle_circle.angle_tracker.animate.set_value(TAU * 2 * y_w + y_phi_0),
+            y_angle_circle.angle_tracker.animate.set_value(
+                TAU * 2 * self.y_w + self.y_phi_0
+            ),
             run_time=8,
         )
-        y_angle_circle.angle_tracker.set_value(y_phi_0)
+        y_angle_circle.angle_tracker.set_value(self.y_phi_0)
 
         group_y = VGroup(y_angle_circle, y_moving_dot)
 
@@ -65,7 +70,7 @@ class SimpleOscillation(Scene):
         self.play(Write(x_formula))
 
         x_angle_circle = AngleCircle(
-            radius=x_radius, phi_0=x_phi_0, arc_offset=PI / 2, label=r"\phi_x"
+            radius=self.x_radius, phi_0=self.x_phi_0, arc_offset=PI / 2, label=r"\phi_x"
         )
 
         self.play(
@@ -74,14 +79,16 @@ class SimpleOscillation(Scene):
         )
 
         self.play(
-            x_angle_circle.angle_tracker.animate.set_value(TAU * 2 * x_w + x_phi_0),
+            x_angle_circle.angle_tracker.animate.set_value(
+                TAU * 2 * self.x_w + self.x_phi_0
+            ),
             run_time=8,
         )
-        x_angle_circle.angle_tracker.set_value(x_phi_0)
+        x_angle_circle.angle_tracker.set_value(self.x_phi_0)
 
         x_moving_dot = MovingDot(
             rotation=0,
-            length=x_radius * 2,
+            length=self.x_radius * 2,
             dot_x=lambda: x_angle_circle.arrow.get_end()[0],
         )
 
@@ -90,10 +97,12 @@ class SimpleOscillation(Scene):
         self.play(Create(x_moving_dot))
 
         self.play(
-            x_angle_circle.angle_tracker.animate.set_value(TAU * 2 * x_w + x_phi_0),
+            x_angle_circle.angle_tracker.animate.set_value(
+                TAU * 2 * self.x_w + self.x_phi_0
+            ),
             run_time=8,
         )
-        x_angle_circle.angle_tracker.set_value(x_phi_0)
+        x_angle_circle.angle_tracker.set_value(self.x_phi_0)
 
         group_x = VGroup(x_angle_circle, x_moving_dot)
 
@@ -134,17 +143,39 @@ class SimpleOscillation(Scene):
 
         traced_path = TracedPath(
             dot.get_center,
-            dissipating_time=1,
+            dissipating_time=1000,
             stroke_color=RED,
             stroke_width=4,
-            stroke_opacity=[1, 0],
+            stroke_opacity=[1, 1],
         )
 
         self.add(dot, traced_path)
 
+        x_dashed_line = Line(stroke_opacity=0.2)
+
+        x_dashed_line.add_updater(
+            lambda a: a.put_start_and_end_on(
+                x_moving_dot.dot.get_center(), dot.get_center()
+            )
+        )
+
+        y_dashed_line = Line(stroke_opacity=0.2)
+
+        y_dashed_line.add_updater(
+            lambda a: a.put_start_and_end_on(
+                y_moving_dot.dot.get_center(), dot.get_center()
+            )
+        )
+
+        self.add(x_dashed_line, y_dashed_line)
+
         self.play(
-            x_angle_circle.angle_tracker.animate.set_value(TAU * 2 * x_w + x_phi_0),
-            y_angle_circle.angle_tracker.animate.set_value(TAU * 2 * y_w + y_phi_0),
+            x_angle_circle.angle_tracker.animate.set_value(
+                TAU * 2 * self.x_w + self.x_phi_0
+            ),
+            y_angle_circle.angle_tracker.animate.set_value(
+                TAU * 2 * self.y_w + self.y_phi_0
+            ),
             run_time=12,
         )
 
